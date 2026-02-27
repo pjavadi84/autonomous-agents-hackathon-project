@@ -2,7 +2,7 @@
 
 ## System Overview
 
-GeoAgent is a Next.js 15 application that implements an autonomous AI agent using OpenAI's function calling API. The agent researches real-time real estate market data via Tavily, stores findings in a Neo4j knowledge graph, and generates GEO-optimized content briefs.
+GeoAgent is a Next.js 15 application that implements an autonomous AI agent using a dual-LLM architecture: **Grok (xAI)** for agent reasoning and tool calling, and **Google Gemini** for content generation. The agent researches real-time real estate market data via Tavily, stores findings in a Neo4j knowledge graph, and generates GEO-optimized content briefs.
 
 ## Architecture Diagram
 
@@ -37,7 +37,7 @@ GeoAgent is a Next.js 15 application that implements an autonomous AI agent usin
 │                    (lib/agent/index.ts)                       │
 │                                                              │
 │  1. Build system prompt (inject self-improvement context)    │
-│  2. Loop: call OpenAI with messages + tools                  │
+│  2. Loop: call Grok with messages + tools                    │
 │  3. Handle tool_calls → execute tool → append result         │
 │  4. Emit SSE event for each step                             │
 │  5. Max 15 iterations, then force brief generation           │
@@ -46,9 +46,11 @@ GeoAgent is a Next.js 15 application that implements an autonomous AI agent usin
        │          │          │          │
        ▼          ▼          ▼          ▼
    ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
-   │ Tavily │ │ Neo4j  │ │ OpenAI │ │  GEO   │
-   │ Client │ │ Client │ │ Client │ │ Scorer │
-   └────────┘ └────────┘ └────────┘ └────────┘
+   ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+   │ Tavily │ │ Neo4j  │ │  Grok  │ │ Gemini │ │  GEO   │
+   │ Client │ │ Client │ │(reason)│ │(content│ │ Scorer │
+   └────────┘ └────────┘ └────────┘ │  gen)  │ └────────┘
+                                     └────────┘
 ```
 
 ## Directory Structure
@@ -86,8 +88,9 @@ src/
 │   │   ├── scoring.ts          # CORE: Deterministic GEO citability scoring
 │   │   ├── jsonld.ts           # JSON-LD template generators
 │   │   └── brief.ts            # Brief assembly + formatting
-│   ├── openai/
-│   │   └── client.ts           # OpenAI client singleton
+│   ├── llm/
+│   │   ├── grok.ts             # Grok client (xAI) — agent reasoning + tool calling
+│   │   └── gemini.ts           # Gemini client — content generation + brief writing
 │   └── store.ts                # In-memory Map<string, ContentBrief>
 │
 └── components/                 # Client-side React
@@ -282,7 +285,7 @@ RETURN
 
 ## Agent Tools
 
-The agent uses 7 tools via OpenAI function calling. The LLM autonomously decides which tools to call and in what order.
+The agent uses 7 tools via Grok's function calling API (xAI uses the OpenAI-compatible API format). The LLM autonomously decides which tools to call and in what order.
 
 ### Tool 1: `search_market_data`
 **Phase**: RESEARCH
@@ -326,7 +329,7 @@ The agent uses 7 tools via OpenAI function calling. The LLM autonomously decides
 **Parameters**: location, topic, targetKeywords, contentType
 **Implementation**:
 1. Query full knowledge graph context for the location
-2. Call GPT-4o with detailed GEO brief generation prompt
+2. Call Gemini (gemini-2.5-flash) with detailed GEO brief generation prompt
 3. Run deterministic GEO scoring algorithm
 4. Generate JSON-LD templates (Article, FAQPage, BreadcrumbList)
 5. Store ContentBrief node in Neo4j with relationships
@@ -484,8 +487,10 @@ type AgentEvent =
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| Agent framework | OpenAI function calling directly | Simpler than Agents SDK (requires Node 22+). Full control over the loop and SSE streaming. |
+| Agent reasoning | Grok (xAI) via OpenAI-compatible API | Fast inference, excellent at tool calling and structured JSON output. xAI API is OpenAI-compatible, so same SDK patterns work. |
+| Content generation | Google Gemini (gemini-2.5-flash) | Superior creative content authorship, nuanced writing for content briefs. |
 | Graph visualization | `react-force-graph-2d` | Lightweight (~200KB), works with plain JSON, produces impressive visuals immediately. |
 | Brief storage | In-memory `Map<string, ContentBrief>` | Neo4j stores graph structure; full brief JSON doesn't need graph queries. Resets on redeploy = fine for hackathon. |
 | Streaming | SSE via ReadableStream | Native to Next.js Route Handlers. One-directional (server→client). No WebSocket setup needed. |
 | Tavily endpoints | `search()` + `extract()` only | The `research()` method requires MongoDB. Standard endpoints + Neo4j as knowledge store is a cleaner architecture. |
+| OpenAI as fallback | Available in system env | Grok is primary, but OpenAI API key exists in shell env as a fallback if xAI has rate limit issues. |

@@ -14,7 +14,7 @@ User Input (location + topic)
         ▼
 ┌─────────────────────────────────────────┐
 │           AGENT ORCHESTRATOR            │
-│    (OpenAI GPT-4o function calling)     │
+│  Grok (reasoning) + Gemini (content)    │
 │                                         │
 │  System prompt includes self-improvement│
 │  context from prior runs (top sources,  │
@@ -42,7 +42,7 @@ User Input (location + topic)
 
 1. **RESEARCH** — Tavily searches live market data, listings, news, neighborhood info
 2. **CONNECT** — Neo4j builds/updates a knowledge graph linking locations, neighborhoods, market signals, sources, and amenities
-3. **GENERATE** — OpenAI produces a GEO-optimized content brief with data-backed claims, JSON-LD schemas, FAQ sections, and an LLM citability score
+3. **GENERATE** — Gemini produces a GEO-optimized content brief with data-backed claims, JSON-LD schemas, FAQ sections, and an LLM citability score
 
 The agent self-improves by tracking source quality, accumulating knowledge across runs, and refining its approach based on GEO score feedback.
 
@@ -52,7 +52,8 @@ The agent self-improves by tracking source quality, accumulating knowledge acros
 |-----------|------|
 | **Next.js 15** (App Router) | Web framework |
 | **TypeScript** | Language |
-| **OpenAI GPT-4o** | Agent reasoning + content generation |
+| **Grok (xAI)** | Agent reasoning + tool calling |
+| **Gemini (Google)** | Content generation + brief writing |
 | **Tavily** | Real-time web search + content extraction |
 | **Neo4j AuraDB** | Knowledge graph (persistent) |
 | **react-force-graph-2d** | Graph visualization |
@@ -85,7 +86,8 @@ Open [http://localhost:3000](http://localhost:3000).
 ### Environment Variables
 
 ```
-OPENAI_API_KEY=sk-...
+GROK_API_KEY=xai-...
+GOOGLE_GEMINI_API_KEY=...
 TAVILY_API_KEY=tvly-...
 NEO4J_URI=neo4j+s://xxxxxxxx.databases.neo4j.io
 NEO4J_USER=neo4j
