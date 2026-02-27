@@ -44,30 +44,43 @@
 ### Neo4j
 **Role**: Knowledge graph storage (persistent across agent runs)
 
-**Setup:**
-1. Go to https://console.neo4j.io
-2. Create a free AuraDB instance (no credit card, no time limit)
-3. Copy the connection URI, username, and download the password
-4. Add to `.env.local`:
+**PRIZE**: "Best Use of Neo4j" — 3 winners (per team member): 1st place credits, 2nd place Bose QuietComfort Ultra Earbuds (2nd Gen), 3rd place JBL Flip 7 Speaker.
+
+**Hackathon Demo App**: https://context-graph-demo.vercel.app/ — A decision tracing system using Neo4j as a knowledge graph with semantic search and graph analytics. GitHub repo: github.com/johnymontana/context-graph-demo. Good reference for graph visualization and querying patterns.
+
+**Setup (Hackathon-Specific):**
+1. **Primary**: Go to https://sandbox.neo4j.com → select "Blank Sandbox" to create a blank instance
+2. **Fallback**: If Sandbox has issues, Neo4j is providing free Enterprise Aura database instances for the hackathon (limited number — ask Nyah Macklin or Yolande Poirier at the Neo4j booth)
+3. **Local option**: Download Neo4j Desktop for running Enterprise instances locally (recommended for large datasets)
+4. Copy the connection URI, username, and password
+5. Add to `.env.local`:
    ```
    NEO4J_URI=neo4j+s://xxxxxxxx.databases.neo4j.io
    NEO4J_USER=neo4j
    NEO4J_PASSWORD=...
    ```
 
+**Public Read-Only Instance (for testing):**
+There's a pre-populated IKEA dataset with vector embeddings + graph data, useful for testing MCP-enabled agents:
+```
+NEO4J_URI=neo4j+s://9ee8bec3.databases.neo4j.io
+NEO4J_USERNAME=read_only
+NEO4J_PASSWORD=read_only
+NEO4J_DATABASE=neo4j
+```
+
 **SDK**: `pnpm add neo4j-driver`
 
-**Free Tier Limits:**
-- 1 database
-- 200K nodes, 400K relationships (more than enough)
-- No time limit — permanently free
-
-**What to ask sponsors:** "Do you have pre-provisioned AuraDB instances for faster setup, or should I use the self-service free tier?"
+**MCP Server**: https://github.com/neo4j-contrib/mcp-neo4j — Neo4j MCP servers with setup videos for Cursor, Claude Code, and VSCode + Copilot. Consider using MCP for agent-to-graph communication instead of raw Cypher.
 
 **Documentation:**
 - JavaScript Driver: https://neo4j.com/docs/javascript-manual/current/
 - Cypher Query Language: https://neo4j.com/docs/cypher-manual/current/
 - GraphAcademy (TypeScript course): https://graphacademy.neo4j.com/courses/app-typescript/
+- Agentic KG Construction (DeepLearning.ai course): referenced in hackathon resources
+- Neo4j Blog on Context Graphs: https://neo4j.com/blog/genai/hands-on-with-context-graphs-and-neo4j/
+
+**Neo4j Contacts**: Nyah Macklin, Yolande Poirier
 
 ---
 
