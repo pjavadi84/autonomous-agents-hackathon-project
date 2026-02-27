@@ -1,85 +1,62 @@
-# Demo Script (5 Minutes)
+# Demo Script & Pitch (5 Minutes)
 
 ## Setup Before Demo
-- Have the app open in browser (deployed URL or localhost:3000)
-- Neo4j console open in a background tab (console.neo4j.io) for optional graph verification
-- Clear any prior agent runs if you want a clean demo
+
+- App open in browser at localhost:3000 (or deployed URL)
+- Neo4j console open in background tab (console.neo4j.io) for optional graph verification
+- Clear any prior agent runs if you want a clean demo, OR keep prior data to show the self-improvement loop
 
 ---
 
-## 1. Introduction (30 seconds)
+## 1. Opening Hook (30 seconds)
 
-> "I'm Pouya. I built GeoAgent — an autonomous AI agent that produces content briefs optimized for AI search engines."
->
-> "We all know SEO — ranking in Google's 10 blue links. But there's a new challenge: GEO — Generative Engine Optimization. When someone asks ChatGPT or Perplexity 'what's the housing market like in San Francisco?', which sources get cited? Fewer than 10% of sources cited by AI engines actually rank in the top 10 on Google. GEO is a completely different game."
->
-> "GeoAgent solves this by researching real-time market data, building a knowledge graph, and generating content briefs that maximize AI citability."
+> "Google gets 8.5 billion searches a day. But increasingly, people aren't clicking links — they're getting answers from ChatGPT, Perplexity, and Google AI Overviews. If your content doesn't get cited by these AI engines, you're invisible. We built an agent that fixes that."
 
----
+## 2. The Problem (30 seconds)
 
-## 2. Live Agent Run (60 seconds)
+> "Real estate brokerages spend thousands on content — market reports, neighborhood guides, buyer guides. But 90% of it is generic, unstructured, and invisible to AI search engines. There's a new discipline called GEO — Generative Engine Optimization — which is like SEO but for AI. Nobody's doing it well because it requires real-time data, structured markup, and a very specific content format. That's a lot of manual work."
 
-> "Let me show you. I'll generate a market report for San Francisco."
+## 3. Live Demo (2 minutes)
 
-**Action**: Type "San Francisco, CA" in the location field, select "Market Report", hit Generate.
+> "GeoAgent is an autonomous agent that does the entire pipeline. Watch."
 
-> "Watch the agent console on the left. The agent is deciding what to research — it's calling Tavily to search for current median home prices, inventory levels, days on market..."
+**Action**: Type "Irvine, CA", select "Investment Analysis", hit Generate.
 
-**Point to the agent console** as search results stream in.
+### Left Panel — Agent Reasoning
 
-> "Now it found some promising data — it's storing each fact as a node in our knowledge graph. 'SF median home price is $1.4M, down 3% year-over-year' — that becomes a MarketSignal node, linked to the source URL."
+> "The agent is reasoning in real-time. It first queries our knowledge graph for any existing data. Then it searches live market data through Tavily — prices, inventory, trends. It's finding that Orange County had a 9% price increase and a $42M mansion sale."
 
-> "It's now searching for neighborhood-level data — Mission District, SOMA, Marina... and storing amenities, school ratings, walkability scores."
+### Center Panel — Knowledge Graph
 
----
+> "Every piece of data gets stored in a Neo4j knowledge graph. You can see nodes appearing — locations, neighborhoods, market signals, sources, amenities — all connected. This graph *persists*. The more you use GeoAgent, the smarter it gets."
 
-## 3. Knowledge Graph (30 seconds)
+### Right Panel — Generated Brief
 
-**Point to the graph visualization in the center column.**
+> "And here's the output — a complete content brief scored 72 out of 100 on our GEO citability scale. It has a structured outline, data-backed claims with source attribution, an FAQ section, and JSON-LD schemas — Article, FAQPage, BreadcrumbList — everything AI search engines look for when deciding what to cite."
 
-> "Every piece of data becomes a node in this graph. Red nodes are locations, blue are neighborhoods, orange are market signals, gray are sources. You can see the connections forming — neighborhoods linked to their market signals, each signal linked to its source URL."
->
-> "This graph persists. It grows with every agent run. Next time someone generates a brief for San Francisco — or even Oakland — the agent already has this data."
+## 4. Self-Improvement Story (30 seconds)
 
----
+> "Here's the key insight — run it again for a different city, and the agent starts by checking what it already knows. It gets faster and more accurate over time. The system prompt dynamically includes which sources were most productive, what the average GEO score has been, and which dimensions are weakest. This is context engineering — the agent's context gets richer with every cycle."
 
-## 4. Generated Brief (45 seconds)
+## 5. The Tech (30 seconds)
 
-**Point to the brief output on the right.**
+> "Under the hood: Grok handles reasoning and tool calling. Gemini generates the content. Tavily provides real-time web search. Neo4j stores the knowledge graph. Seven tools the agent calls autonomously — search, extract, store, query, generate. Deterministic GEO scoring across six dimensions. All streaming in real-time via SSE."
 
-> "Here's the output — a complete GEO-optimized content brief."
+## 6. Close (30 seconds)
 
-**Point to the GEO score badge.**
-
-> "First, the GEO citability score: 78 out of 100. This is a deterministic algorithm scoring six dimensions."
-
-**Scroll through the brief.**
-
-> "Data-backed claims — each one has a specific number, a source URL, and a confidence level. 'Median home price in SF is $1.4M as of February 2026, down 3% year-over-year, source: Zillow Research.'"
->
-> "FAQ section — real questions with data-driven answers, structured for FAQPage schema. AI engines love pulling from FAQ sections."
->
-> "And here's the JSON-LD — Article schema, FAQPage schema, BreadcrumbList schema. This is the structured data that AI crawlers parse. Most real estate content doesn't have this."
+> "Every real estate brokerage needs content. None of them are optimized for AI search. GeoAgent turns a day of manual research into 60 seconds of autonomous intelligence — and the output is specifically engineered to be cited by the next generation of search."
 
 ---
 
-## 5. Self-Improvement Demo (30 seconds)
+## Demo Order (Recommended)
 
-> "Now here's the key part — the agent gets smarter."
+For maximum impact, run these in sequence:
 
-**Action**: Type "Oakland, CA" and generate another brief.
+1. **San Francisco, CA** — Market Report (largest dataset, impressive graph)
+2. **Irvine, CA** — Investment Analysis (shows different content type)
+3. **Oakland, CA** — Neighborhood Guide (agent finds SF data in graph — self-improvement visible)
 
-> "Watch — the agent starts by querying the knowledge graph. It already has SF data it can cross-reference. And the system prompt now includes preferred sources from the first run — it learned that Zillow Research and Redfin were the most productive sources."
->
-> "The second brief scores higher because the agent had richer context. This is the self-improvement loop — source quality tracking, knowledge accumulation, and score-based refinement."
-
----
-
-## 6. Closing (30 seconds)
-
-> "GeoAgent uses four sponsor tools: Tavily for real-time web search, Neo4j for the knowledge graph, OpenAI for reasoning and generation, and it's deployed on Render."
->
-> "The key insight is that this is context engineering — the agent's context gets richer with every cycle. The knowledge graph is the memory. The GEO score is the feedback loop. And the content briefs are real-world action: data-backed, structured, and built to be cited by AI."
+The third run is the money shot: the agent discovers existing data in the knowledge graph, uses preferred sources from prior runs, and the brief scores higher.
 
 ---
 
@@ -91,6 +68,8 @@ If the live demo fails:
 3. Show the brief JSON output directly
 4. The graph visualization with pre-populated data is the most impressive visual — have it loaded in a separate tab
 
+---
+
 ## Key Phrases to Hit
 
 - **"Context engineering"** — matches the hackathon theme exactly
@@ -99,6 +78,8 @@ If the live demo fails:
 - **"Meaningful action"** — produces a tangible, usable content brief
 - **"The knowledge graph is the memory"** — the graph persists and grows
 - **"GEO citability score"** — a novel, quantifiable metric
+
+---
 
 ## Questions Judges Might Ask
 
@@ -113,3 +94,6 @@ If the live demo fails:
 
 **Q: Why Neo4j instead of a vector database?**
 > "Real estate data is inherently a graph — neighborhoods connect to schools, market signals, amenities, and sources. GraphRAG lets the agent traverse these relationships to find cross-references, not just similar vectors. The graph also provides explainability — you can see exactly what data informed each claim."
+
+**Q: Why Grok + Gemini instead of a single LLM?**
+> "Different strengths. Grok is fast at reasoning and tool calling — it decides what to research and when. Gemini excels at creative content generation — it writes the actual brief. Using both gives us speed on the orchestration side and quality on the output side."

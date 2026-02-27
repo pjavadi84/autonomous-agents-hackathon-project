@@ -2,8 +2,7 @@ import grok, { GROK_MODEL } from "../llm/grok";
 import { toolDefinitions, executeTool } from "./tools";
 import { buildSystemPrompt, buildUserMessage } from "./prompts";
 import { getTopSourceDomains, getAverageGeoScore } from "../neo4j/queries";
-import { getWeakestDimension } from "../geo/scoring";
-import type { AgentConfig, AgentEvent, ContentBrief, GeoScore } from "./types";
+import type { AgentConfig, AgentEvent, ContentBrief } from "./types";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 const MAX_ITERATIONS = 15;
@@ -96,7 +95,6 @@ export async function runAgent(config: AgentConfig): Promise<ContentBrief> {
   ];
 
   let finalBrief: ContentBrief | null = null;
-  let totalNodesAdded = 0;
 
   for (let i = 0; i < MAX_ITERATIONS; i++) {
     try {
@@ -140,7 +138,6 @@ export async function runAgent(config: AgentConfig): Promise<ContentBrief> {
 
           // Track graph growth
           if (nodesAdded) {
-            totalNodesAdded += nodesAdded;
             onEvent({ type: "graph_update", nodesAdded, edgesAdded: nodesAdded });
           }
 

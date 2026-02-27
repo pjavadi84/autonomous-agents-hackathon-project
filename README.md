@@ -4,25 +4,70 @@
 
 # GeoAgent
 
-**Real-Time Market Intelligence Agent for Real Estate Content**
+> **SEO made you findable. GEO makes you citable. This agent does it autonomously.**
 
-An autonomous, self-improving AI agent that researches live real estate market data, builds a persistent knowledge graph, and generates GEO-optimized (Generative Engine Optimization) content briefs — content structured so AI search engines (ChatGPT, Perplexity, Google AI Overviews) will cite it.
+**Turn real-time market data into AI-citable content — in 60 seconds.**
 
-Built for the [SF Autonomous Agents Hackathon](https://luma.com/sfagents) (Feb 27, 2026).
+Google gets 8.5 billion searches a day, but increasingly people get answers from ChatGPT, Perplexity, and Google AI Overviews without clicking a link. If your content isn't structured for these AI engines to cite, you're invisible.
+
+GeoAgent is an autonomous AI agent that researches live real estate data, builds a persistent knowledge graph, and generates content briefs scored for **GEO (Generative Engine Optimization)** — the discipline of making content citable by AI search engines.
+
+Built for the [SF Autonomous Agents Hackathon](https://luma.com/sfagents) — Context Engineering Challenge (Feb 27, 2026).
+
+---
+
+## The Problem
+
+Real estate brokerages spend 2–4 hours per market report manually researching prices, inventory, trends, and neighborhood data. The content they produce is:
+
+- **Stale** — based on whatever the writer Googled that day
+- **Unstructured** — no JSON-LD schemas, no FAQ markup, no source attribution
+- **Invisible to AI** — ChatGPT and Perplexity cite fewer than 10% of top-ranking Google pages
+
+Meanwhile, AI search engines decide what to cite based on **data density, structured markup, source authority, and content freshness** — none of which most content teams optimize for.
+
+## The Solution
+
+GeoAgent compresses that entire workflow into a single autonomous agent run:
+
+1. **Type a location** — "Irvine, CA"
+2. **Pick a content type** — Market Report, Investment Analysis, Neighborhood Guide, or Buyer Guide
+3. **Watch the agent work** — it researches live data, stores findings in a knowledge graph, and generates a GEO-optimized brief
+
+The output is a complete content brief with:
+- **Data-backed claims** with source URLs and confidence levels
+- **GEO citability score** (0–100) across 6 dimensions
+- **JSON-LD schemas** (Article, FAQPage, BreadcrumbList) for AI discoverability
+- **FAQ section** with researched, data-driven answers
+- **Competitor gaps** — what existing content misses
+- **LLM citability tips** — specific advice for maximizing AI citations
+
+### The Self-Improvement Loop
+
+This is the "context engineering" core:
+
+- **Knowledge accumulates** — the Neo4j graph persists across runs. Research Oakland after San Francisco, and the agent already knows Bay Area market context.
+- **Sources get ranked** — the agent tracks which domains yielded the most useful data and prioritizes them in future runs.
+- **Scores drive refinement** — the system prompt dynamically includes the average GEO score and weakest dimension, so the agent focuses on improving where it's weakest.
+
+Every run makes the next one smarter.
+
+---
 
 ## How It Works
 
 ```
-User Input (location + topic)
+User Input (location + content type)
         │
         ▼
 ┌─────────────────────────────────────────┐
 │           AGENT ORCHESTRATOR            │
 │  Grok (reasoning) + Gemini (content)    │
 │                                         │
-│  System prompt includes self-improvement│
-│  context from prior runs (top sources,  │
-│  avg GEO score, weak dimensions)        │
+│  Dynamic system prompt injects:         │
+│  - Preferred sources from prior runs    │
+│  - Average GEO score + weak dimensions  │
+│  - Existing graph data for the region   │
 └───────┬──────────┬──────────┬───────────┘
         │          │          │
    RESEARCH    CONNECT    GENERATE
@@ -42,27 +87,45 @@ User Input (location + topic)
         └──────────────────┘
 ```
 
-**3-Phase Agent Loop:**
+**7 autonomous tools** the agent calls on its own:
 
-1. **RESEARCH** — Tavily searches live market data, listings, news, neighborhood info
-2. **CONNECT** — Neo4j builds/updates a knowledge graph linking locations, neighborhoods, market signals, sources, and amenities
-3. **GENERATE** — Gemini produces a GEO-optimized content brief with data-backed claims, JSON-LD schemas, FAQ sections, and an LLM citability score
+| Tool | Phase | What it does |
+|------|-------|-------------|
+| `search_market_data` | Research | Live market prices, inventory, trends via Tavily |
+| `search_neighborhood_info` | Research | Schools, amenities, walkability, lifestyle |
+| `extract_page_content` | Research | Deep-dive into a specific URL |
+| `store_market_signal` | Connect | Write a data point to Neo4j with source attribution |
+| `store_amenity` | Connect | Write a neighborhood amenity to Neo4j |
+| `query_knowledge_graph` | Connect | Read existing data before researching |
+| `generate_content_brief` | Generate | Produce the final GEO-scored brief via Gemini |
 
-The agent self-improves by tracking source quality, accumulating knowledge across runs, and refining its approach based on GEO score feedback.
+**GEO Scoring** (deterministic, no LLM):
+
+| Dimension | Max Points | What it measures |
+|-----------|-----------|-----------------|
+| Data-Backed Claims | 20 | Cited facts with source URLs |
+| Structured Data | 20 | JSON-LD schemas present |
+| Content Structure | 20 | FAQ, headings, bullet points, meta description |
+| Freshness | 15 | How recent the data is |
+| Original Insights | 15 | Competitor gaps, cross-references, comparisons |
+| Source Authority | 10 | .gov, major news, industry sources weighted higher |
+
+---
 
 ## Tech Stack
 
 | Technology | Role |
 |-----------|------|
-| **Next.js 15** (App Router) | Web framework |
+| **Next.js 15** (App Router) | Web framework + SSE streaming |
 | **TypeScript** | Language |
-| **Grok (xAI)** | Agent reasoning + tool calling |
-| **Gemini (Google)** | Content generation + brief writing |
+| **Grok** (xAI) | Agent reasoning + tool calling |
+| **Gemini** (Google) | Content generation + brief writing |
 | **Tavily** | Real-time web search + content extraction |
-| **Neo4j AuraDB** | Knowledge graph (persistent) |
-| **react-force-graph-2d** | Graph visualization |
+| **Neo4j AuraDB** | Persistent knowledge graph |
+| **react-force-graph-2d** | Real-time graph visualization |
 | **Tailwind CSS** | Styling |
-| **Render** | Deployment |
+
+---
 
 ## Getting Started
 
@@ -74,14 +137,9 @@ The agent self-improves by tracking source quality, accumulating knowledge acros
 ### Setup
 
 ```bash
-# Install dependencies
 pnpm install
-
-# Copy environment variables
 cp .env.example .env.local
 # Fill in your API keys (see docs/PROVIDER_SETUP.md)
-
-# Start development server
 pnpm dev
 ```
 
@@ -98,25 +156,33 @@ NEO4J_USER=neo4j
 NEO4J_PASSWORD=...
 ```
 
+---
+
+## What is GEO?
+
+**Generative Engine Optimization** is the practice of structuring content so AI-powered search platforms retrieve, cite, and recommend it. Unlike traditional SEO (ranking in 10 blue links), GEO is about earning a place among the 2–7 sources that LLMs cite in a single response.
+
+Research shows that content with **cited statistics, structured data markup, and authoritative sourcing** gets cited 30–40% more often by AI engines than generic content — even if that generic content ranks higher on Google.
+
+GeoAgent implements every known GEO technique:
+- Data-backed claims with inline source attribution
+- JSON-LD structured data (Article, FAQPage, BreadcrumbList)
+- FAQ sections with researched, quantitative answers
+- Content freshness signals tied to real-time data
+- Source authority weighting
+- `llms.txt` file for AI crawler guidance
+
+---
+
 ## Documentation
 
 - [Technical Architecture](docs/ARCHITECTURE.md) — System design, graph schema, agent tools, GEO scoring
 - [Business Case](docs/BUSINESS_CASE.md) — Problem statement, market opportunity, competitive positioning
-- [Provider Setup](docs/PROVIDER_SETUP.md) — API keys, free tiers, hackathon credits for each sponsor
-- [Implementation Plan](docs/IMPLEMENTATION_PLAN.md) — Hour-by-hour build timeline
-- [Demo Script](docs/DEMO_SCRIPT.md) — 5-minute presentation for judges
+- [Provider Setup](docs/PROVIDER_SETUP.md) — API keys and setup for each provider
+- [Implementation Plan](docs/IMPLEMENTATION_PLAN.md) — Build timeline
+- [Demo Script](docs/DEMO_SCRIPT.md) — 5-minute pitch for judges
 
-## What is GEO?
-
-**Generative Engine Optimization (GEO)** is the practice of structuring content so that AI-powered search platforms can retrieve, cite, and recommend it. Unlike traditional SEO (ranking in 10 blue links), GEO is about earning a place among the 2-7 domains that LLMs cite in a single response.
-
-Key GEO techniques this agent implements:
-- Data-backed claims with cited sources
-- JSON-LD structured data (Article, FAQPage, BreadcrumbList)
-- FAQ sections with real, researched answers
-- Content freshness signals
-- Source authority weighting
-- `llms.txt` file for AI crawler guidance
+---
 
 ## License
 
