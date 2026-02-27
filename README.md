@@ -1,3 +1,7 @@
+
+<img width="1435" height="691" alt="Screenshot 2026-02-27 at 2 45 15 PM" src="https://github.com/user-attachments/assets/1f855520-cac5-4569-ae9e-f323495894ce" />
+
+
 # GeoAgent
 
 **Real-Time Market Intelligence Agent for Real Estate Content**
